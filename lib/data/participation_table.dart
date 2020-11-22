@@ -2,9 +2,9 @@ class ParticipationTable {
   final String title;
   final int timestamp;
   final bool isActive;
-  final Map<int, Event> events;
+  final Map<int, TableEvent> events;
 
-  List<MapEntry<int, Event>> get sortedEvents => events.entries.toList()
+  List<MapEntry<int, TableEvent>> get sortedEvents => events.entries.toList()
     ..sort((e1, e2) => e1.value.timestamp.compareTo(e2.value.timestamp));
 
   ParticipationTable({this.title, this.timestamp, this.isActive, this.events});
@@ -13,19 +13,19 @@ class ParticipationTable {
     final title = map['title'];
     final timestamp = map['timestamp'];
     final isActive = map['isActive'];
-    final Map<int, Event> events = {};
+    final Map<int, TableEvent> events = {};
 
     final eventsData = map['events'];
     if (eventsData is List) {
       for (int i = 0; i < eventsData.length; i++) {
         if (eventsData[i] != null) {
-          events[i] = Event.fromMap(eventsData[i]);
+          events[i] = TableEvent.fromMap(eventsData[i]);
         }
       }
     } else if (eventsData is Map) {
       eventsData.forEach((key, value) {
         final id = int.parse(key as String);
-        events[id] = Event.fromMap(eventsData[id]);
+        events[id] = TableEvent.fromMap(eventsData[id]);
       });
     }
 
@@ -39,14 +39,14 @@ class ParticipationTable {
   }
 }
 
-class Event {
+class TableEvent {
   final String title;
   final int timestamp;
   final Map<int, GroupStatus> groups;
 
-  Event({this.title, this.timestamp, this.groups});
+  TableEvent({this.title, this.timestamp, this.groups});
 
-  factory Event.fromMap(Map map) {
+  factory TableEvent.fromMap(Map map) {
     final title = map['title'];
     final timestamp = map['timestamp'];
     Map<int, GroupStatus> groups;
@@ -62,7 +62,7 @@ class Event {
       groups = (map['groups'] as Map)?.map((key, value) =>
           MapEntry(int.parse(key.toString()), GroupStatus.fromMap(value)));
     }
-    return Event(title: title, timestamp: timestamp, groups: groups);
+    return TableEvent(title: title, timestamp: timestamp, groups: groups);
   }
 
   @override
