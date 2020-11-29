@@ -1,26 +1,47 @@
+import 'dart:async';
+
 import 'package:firebase/firebase.dart';
 import 'package:flutter/material.dart';
 import 'package:music_groups/data/group.dart';
 import 'package:music_groups/data/participation_table.dart';
 
 class ParticipationProvider extends ChangeNotifier {
-  List<Group> groups;
+  Map<int, Group> groups;
+  List<MapEntry<int, Group>> get sortedGroups {
+    if (groups == null) return null;
+    return groups.entries.toList()
+      ..sort((g1, g2) => g1.value.name.compareTo(g2.value.name));
+  }
+
   ParticipationTable participationTable;
-  int _participationIndex;
+  List<MapEntry<int, Event>> get sortedEvents {
+    if (participationTable == null) return null;
+    return participationTable.sortedEvents;
+  }
+
+  int _tableId;
 
   bool _isGroupsLoaded = false;
   bool _isParticipationTableLoaded = false;
 
   bool get isDataLoaded => _isGroupsLoaded && _isParticipationTableLoaded;
 
+  StreamSubscription _tableStreamSubscription;
+
   ParticipationProvider() {
     _fetchGroups();
     _listenParticipationTable();
   }
 
-  void toggleParticipation(int eventIndex, int groupId) async {
-    final dbRef = database().ref(
-        'participations/$_participationIndex/events/$eventIndex/groups/$groupId/status');
+  @override
+  void dispose() {
+    super.dispose();
+    _tableStreamSubscription.cancel();
+  }
+
+  void toggleParticipation(int eventId, int groupId) async {
+    final dbRef = database()
+        .ref('v2/tables/$_tableId/events/$eventId/groups/$groupId/status');
     int status = (await dbRef.once('value')).snapshot.val() ??
         GroupStatus.STATUS_CANNOT_PARTICIPATE;
     switch (status) {
@@ -34,38 +55,56 @@ class ParticipationProvider extends ChangeNotifier {
     await dbRef.set(status);
   }
 
-  void removeParticipation(int eventIndex, int groupId) {
-    final dbRef = database().ref(
-        'participations/$_participationIndex/events/$eventIndex/groups/$groupId/status');
+  void removeParticipation(int eventId, int groupId) {
+    final dbRef = database()
+        .ref('v2/tables/$_tableId/events/$eventId/groups/$groupId/status');
     dbRef.remove();
   }
 
   void _fetchGroups() async {
-    final event = await database().ref('groups').once('value');
-    final data = event.snapshot.val() as List;
-    groups = data.map((e) => Group.fromMap(e)).toList();
-    groups.sort((g1, g2) => g1.name.compareTo(g2.name));
+    final event = await database().ref('v2/groups').once('value');
+    final data = event.snapshot.val();
+    groups = {};
+    if (data is List) {
+      for (int i = 0; i < data.length; i++) {
+        if (data[i] != null) {
+          groups[i] = Group.fromMap(data[i]);
+        }
+      }
+    } else if (data is Map) {
+      data.forEach((key, value) {
+        final id = int.parse(key as String);
+        groups[id] = Group.fromMap(data[key]);
+      });
+    }
     _isGroupsLoaded = true;
     notifyListeners();
   }
 
   void _listenParticipationTable() async {
-    final event = await database().ref('participations').once('value');
-    final data = event.snapshot.val() as List;
+    final event = await database().ref('v2/tables').once('value');
+    final data = event.snapshot.val();
     Map map;
-    for (int i = 0; i < data.length; i++) {
-      if (data[i]['isActive']) {
-        _participationIndex = i;
-        map = data[i];
-        break;
+    if (data is List) {
+      for (int i = 0; i < data.length; i++) {
+        if (data[i] != null && data[i]['isActive']) {
+          _tableId = i;
+          map = data[i];
+          break;
+        }
+      }
+    } else if (data is Map) {
+      for (MapEntry entry in data.entries) {
+        if (entry.value['isActive']) {
+          _tableId = int.parse(entry.key as String);
+          map = entry.value;
+        }
       }
     }
-    if (_participationIndex != null && map != null) {
+    if (_tableId != null && map != null) {
       participationTable = ParticipationTable.fromMap(map);
-      database()
-          .ref('participations/$_participationIndex')
-          .onValue
-          .listen((event) {
+      _tableStreamSubscription =
+          database().ref('v2/tables/$_tableId').onValue.listen((event) {
         participationTable = ParticipationTable.fromMap(event.snapshot.val());
         notifyListeners();
       });

@@ -17,69 +17,73 @@ class ParticipationRoute extends StatelessWidget {
     return ChangeNotifierProvider<ParticipationProvider>(
       create: (context) => ParticipationProvider(),
       child: Consumer<ParticipationProvider>(
-        builder: (context, provider, child) => Scaffold(
-          appBar: AppBar(
-            title: Text(provider.participationTable?.title ?? 'Участие групп'),
-          ),
-          body: SafeArea(
-            child: provider.isDataLoaded
-                ? StickyHeadersTable(
-                    columnsLength:
-                        provider.participationTable?.events?.length ?? 0,
-                    rowsLength: provider.groups?.length ?? 0,
-                    columnsTitleBuilder: (i) => MyTableCell.stickyRow(
-                      child: Text(provider.participationTable.events[i].title,
-                          textAlign: TextAlign.center,
-                          style: TextStyle(
-                              fontWeight: FontWeight.bold, fontSize: 14)),
-                      cellDimensions: cellDimensions,
-                    ),
-                    rowsTitleBuilder: (i) => MyTableCell.stickyColumn(
-                        // '${provider.groups[i].name}\n${provider.groups[i].leader}',
-                        child: Container(
-                          width: double.infinity,
-                          padding: EdgeInsets.all(8),
-                          child: Column(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(provider.groups[i].name,
-                                  maxLines: provider.groups[i].leader.isNotEmpty
-                                      ? 1
-                                      : 2,
-                                  overflow: TextOverflow.ellipsis,
-                                  style: TextStyle(
-                                      fontWeight: FontWeight.bold,
-                                      fontSize: 14)),
-                              if (provider.groups[i].leader.isNotEmpty)
-                                Text('(${provider.groups[i].leader})',
-                                    maxLines: 1,
+        builder: (context, provider, child) {
+          final groups = provider.sortedGroups;
+          final events = provider.sortedEvents;
+          return Scaffold(
+            appBar: AppBar(
+              title:
+                  Text(provider.participationTable?.title ?? 'Участие групп'),
+            ),
+            body: SafeArea(
+              child: provider.isDataLoaded
+                  ? StickyHeadersTable(
+                      columnsLength: events?.length ?? 0,
+                      rowsLength: groups?.length ?? 0,
+                      columnsTitleBuilder: (i) => MyTableCell.stickyRow(
+                        child: Text(events[i].value.title,
+                            textAlign: TextAlign.center,
+                            style: TextStyle(
+                                fontWeight: FontWeight.bold, fontSize: 14)),
+                        cellDimensions: cellDimensions,
+                      ),
+                      rowsTitleBuilder: (i) => MyTableCell.stickyColumn(
+                          child: Container(
+                            width: double.infinity,
+                            padding: EdgeInsets.all(8),
+                            child: Column(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(groups[i].value.name,
+                                    maxLines: groups[i].value.leader.isNotEmpty
+                                        ? 1
+                                        : 2,
                                     overflow: TextOverflow.ellipsis,
-                                    style: TextStyle(fontSize: 12))
-                            ],
+                                    style: TextStyle(
+                                        fontWeight: FontWeight.bold,
+                                        fontSize: 14)),
+                                if (groups[i].value.leader.isNotEmpty)
+                                  Text('(${groups[i].value.leader})',
+                                      maxLines: 1,
+                                      overflow: TextOverflow.ellipsis,
+                                      style: TextStyle(fontSize: 12))
+                              ],
+                            ),
                           ),
-                        ),
-                        cellDimensions: cellDimensions),
-                    contentCellBuilder: (eventIndex, groupIndex) =>
-                        MyTableCell.content(
-                            child: _getCellWidget(
-                                provider, eventIndex, groupIndex),
-                            cellDimensions: cellDimensions),
-                    legendCell:
-                        MyTableCell.legend(cellDimensions: cellDimensions),
-                    cellDimensions: cellDimensions,
-                  )
-                : Center(child: CircularProgressIndicator()),
-          ),
-        ),
+                          cellDimensions: cellDimensions),
+                      contentCellBuilder: (eventIndex, groupIndex) =>
+                          MyTableCell.content(
+                              child: _getCellWidget(
+                                  provider,
+                                  events[eventIndex].value,
+                                  events[eventIndex].key,
+                                  groups[groupIndex].key),
+                              cellDimensions: cellDimensions),
+                      legendCell:
+                          MyTableCell.legend(cellDimensions: cellDimensions),
+                      cellDimensions: cellDimensions,
+                    )
+                  : Center(child: CircularProgressIndicator()),
+            ),
+          );
+        },
       ),
     );
   }
 
   Widget _getCellWidget(
-      ParticipationProvider provider, int eventIndex, int groupIndex) {
-    final groupId = provider.groups[groupIndex].id;
-    final event = provider.participationTable.events[eventIndex];
+      ParticipationProvider provider, Event event, int eventId, int groupId) {
     final groupStatus = (event.groups ?? {})[groupId];
     Color color;
     if (groupStatus == null) {
@@ -98,8 +102,8 @@ class ParticipationRoute extends StatelessWidget {
       }
     }
     return GestureDetector(
-      onTap: () => provider.toggleParticipation(eventIndex, groupId),
-      onLongPress: () => provider.removeParticipation(eventIndex, groupId),
+      onTap: () => provider.toggleParticipation(eventId, groupId),
+      onLongPress: () => provider.removeParticipation(eventId, groupId),
       child: Container(
           width: double.infinity, height: double.infinity, color: color),
     );

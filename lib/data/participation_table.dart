@@ -1,15 +1,37 @@
 class ParticipationTable {
   final String title;
+  final int timestamp;
   final bool isActive;
-  final List<Event> events;
+  final Map<int, Event> events;
 
-  ParticipationTable({this.title, this.isActive, this.events});
+  List<MapEntry<int, Event>> get sortedEvents => events.entries.toList()
+    ..sort((e1, e2) => e1.value.timestamp.compareTo(e2.value.timestamp));
 
-  ParticipationTable.fromMap(Map map)
-      : title = map['title'],
-        isActive = map['isActive'],
-        events =
-            (map['events'] as List)?.map((e) => Event.fromMap(e))?.toList();
+  ParticipationTable({this.title, this.timestamp, this.isActive, this.events});
+
+  factory ParticipationTable.fromMap(Map map) {
+    final title = map['title'];
+    final timestamp = map['timestamp'];
+    final isActive = map['isActive'];
+    final Map<int, Event> events = {};
+
+    final eventsData = map['events'];
+    if (eventsData is List) {
+      for (int i = 0; i < eventsData.length; i++) {
+        if (eventsData[i] != null) {
+          events[i] = Event.fromMap(eventsData[i]);
+        }
+      }
+    } else if (eventsData is Map) {
+      eventsData.forEach((key, value) {
+        final id = int.parse(key as String);
+        events[id] = Event.fromMap(eventsData[id]);
+      });
+    }
+
+    return ParticipationTable(
+        title: title, timestamp: timestamp, isActive: isActive, events: events);
+  }
 
   @override
   String toString() {
@@ -19,12 +41,14 @@ class ParticipationTable {
 
 class Event {
   final String title;
+  final int timestamp;
   final Map<int, GroupStatus> groups;
 
-  Event({this.title, this.groups});
+  Event({this.title, this.timestamp, this.groups});
 
   factory Event.fromMap(Map map) {
     final title = map['title'];
+    final timestamp = map['timestamp'];
     Map<int, GroupStatus> groups;
     if (map['groups'] is List) {
       groups = {};
@@ -38,7 +62,7 @@ class Event {
       groups = (map['groups'] as Map)?.map((key, value) =>
           MapEntry(int.parse(key.toString()), GroupStatus.fromMap(value)));
     }
-    return Event(title: title, groups: groups);
+    return Event(title: title, timestamp: timestamp, groups: groups);
   }
 
   @override
