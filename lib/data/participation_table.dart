@@ -19,13 +19,19 @@ class ParticipationTable {
     if (eventsData is List) {
       for (int i = 0; i < eventsData.length; i++) {
         if (eventsData[i] != null) {
-          events[i] = Event.fromMap(eventsData[i]);
+          final event = Event.fromMap(eventsData[i]);
+          if (event.isActive) {
+            events[i] = event;
+          }
         }
       }
     } else if (eventsData is Map) {
       eventsData.forEach((key, value) {
         final id = int.parse(key as String);
-        events[id] = Event.fromMap(eventsData[id]);
+        final event = Event.fromMap(eventsData[id]);
+        if (event.isActive) {
+          events[id] = event;
+        }
       });
     }
 
@@ -42,13 +48,15 @@ class ParticipationTable {
 class Event {
   final String title;
   final int timestamp;
+  final bool isActive;
   final Map<int, GroupStatus> groups;
 
-  Event({this.title, this.timestamp, this.groups});
+  Event({this.title, this.timestamp, this.isActive, this.groups});
 
   factory Event.fromMap(Map map) {
     final title = map['title'];
     final timestamp = map['timestamp'];
+    final isActive = map['isActive'] ?? true;
     Map<int, GroupStatus> groups;
     if (map['groups'] is List) {
       groups = {};
@@ -62,7 +70,8 @@ class Event {
       groups = (map['groups'] as Map)?.map((key, value) =>
           MapEntry(int.parse(key.toString()), GroupStatus.fromMap(value)));
     }
-    return Event(title: title, timestamp: timestamp, groups: groups);
+    return Event(
+        title: title, timestamp: timestamp, isActive: isActive, groups: groups);
   }
 
   @override

@@ -26,7 +26,7 @@ class ParticipationProvider extends ChangeNotifier {
 
   bool get isDataLoaded => _isGroupsLoaded && _isParticipationTableLoaded;
 
-  StreamSubscription _tableStreamSubscription;
+  StreamSubscription _dataStreamSubscription;
 
   ParticipationProvider() {
     _fetchGroups();
@@ -36,7 +36,7 @@ class ParticipationProvider extends ChangeNotifier {
   @override
   void dispose() {
     super.dispose();
-    _tableStreamSubscription.cancel();
+    _dataStreamSubscription.cancel();
   }
 
   void toggleParticipation(int eventId, int groupId) async {
@@ -82,34 +82,31 @@ class ParticipationProvider extends ChangeNotifier {
   }
 
   void _listenParticipationTable() async {
-    final event = await database().ref('v2/tables').once('value');
-    final data = event.snapshot.val();
-    Map map;
-    if (data is List) {
-      for (int i = 0; i < data.length; i++) {
-        if (data[i] != null && data[i]['isActive']) {
-          _tableId = i;
-          map = data[i];
-          break;
+    _dataStreamSubscription =
+        database().ref('v2').onValue.listen((event) async {
+      final data = (event.snapshot.val() as Map)['tables'];
+      Map map;
+      if (data is List) {
+        for (int i = 0; i < data.length; i++) {
+          if (data[i] != null && data[i]['isActive']) {
+            _tableId = i;
+            map = data[i];
+            break;
+          }
+        }
+      } else if (data is Map) {
+        for (MapEntry entry in data.entries) {
+          if (entry.value['isActive']) {
+            _tableId = int.parse(entry.key as String);
+            map = entry.value;
+          }
         }
       }
-    } else if (data is Map) {
-      for (MapEntry entry in data.entries) {
-        if (entry.value['isActive']) {
-          _tableId = int.parse(entry.key as String);
-          map = entry.value;
-        }
+      if (_tableId != null && map != null) {
+        participationTable = ParticipationTable.fromMap(map);
       }
-    }
-    if (_tableId != null && map != null) {
-      participationTable = ParticipationTable.fromMap(map);
-      _tableStreamSubscription =
-          database().ref('v2/tables/$_tableId').onValue.listen((event) {
-        participationTable = ParticipationTable.fromMap(event.snapshot.val());
-        notifyListeners();
-      });
-    }
-    _isParticipationTableLoaded = true;
-    notifyListeners();
+      _isParticipationTableLoaded = true;
+      notifyListeners();
+    });
   }
 }
