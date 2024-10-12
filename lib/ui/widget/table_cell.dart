@@ -3,12 +3,12 @@ import 'package:table_sticky_headers/table_sticky_headers.dart';
 
 class MyTableCell extends StatelessWidget {
   MyTableCell.content({
-    this.child,
+    required this.child,
     this.cellDimensions = CellDimensions.base,
     this.colorBg = Colors.white,
     this.onTap,
-  })  : cellWidth = cellDimensions.contentCellWidth,
-        cellHeight = cellDimensions.contentCellHeight,
+  })  : cellWidth = cellDimensions.contentCellWidth!,
+        cellHeight = cellDimensions.contentCellHeight!,
         _colorHorizontalBorder = Colors.black38,
         _colorVerticalBorder = Colors.black38,
         _padding = EdgeInsets.zero;
@@ -25,31 +25,31 @@ class MyTableCell extends StatelessWidget {
         _padding = EdgeInsets.zero;
 
   MyTableCell.stickyRow({
-    this.child,
+    required this.child,
     this.cellDimensions = CellDimensions.base,
     this.colorBg = const Color(0xFFE0E0E0),
     this.onTap,
-  })  : cellWidth = cellDimensions.contentCellWidth,
+  })  : cellWidth = cellDimensions.contentCellWidth!,
         cellHeight = cellDimensions.stickyLegendHeight,
         _colorHorizontalBorder = Colors.black38,
         _colorVerticalBorder = Colors.black38,
         _padding = EdgeInsets.zero;
 
   MyTableCell.stickyColumn({
-    this.child,
+    required this.child,
     this.cellDimensions = CellDimensions.base,
     this.colorBg = const Color(0xFFE0E0E0),
     this.onTap,
   })  : cellWidth = cellDimensions.stickyLegendWidth,
-        cellHeight = cellDimensions.contentCellHeight,
+        cellHeight = cellDimensions.contentCellHeight!,
         _colorHorizontalBorder = Colors.black38,
         _colorVerticalBorder = Colors.black38,
         _padding = EdgeInsets.zero;
 
   final CellDimensions cellDimensions;
 
-  final Widget child;
-  final Function onTap;
+  final Widget? child;
+  final Function? onTap;
 
   final double cellWidth;
   final double cellHeight;
@@ -63,7 +63,9 @@ class MyTableCell extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
-      onTap: onTap,
+      onTap: () {
+        if (onTap != null) onTap!();
+      },
       child: Container(
         width: cellWidth,
         height: cellHeight,

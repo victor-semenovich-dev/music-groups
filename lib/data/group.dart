@@ -3,7 +3,7 @@ class Group {
   final String leader;
   final bool isActive;
 
-  Group({this.name, this.leader, this.isActive});
+  Group({required this.name, required this.leader, required this.isActive});
 
   Group.fromMap(Map map)
       : name = map['name'],

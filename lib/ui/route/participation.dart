@@ -8,7 +8,7 @@ import 'package:table_sticky_headers/table_sticky_headers.dart';
 class ParticipationRoute extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    const CellDimensions cellDimensions = CellDimensions(
+    const CellDimensions cellDimensions = CellDimensions.fixed(
       contentCellWidth: 100.0,
       contentCellHeight: 55.0,
       stickyLegendWidth: 150.0,
@@ -31,7 +31,7 @@ class ParticipationRoute extends StatelessWidget {
                       columnsLength: events?.length ?? 0,
                       rowsLength: groups?.length ?? 0,
                       columnsTitleBuilder: (i) => MyTableCell.stickyRow(
-                        child: Text(events[i].value.title,
+                        child: Text(events![i].value.title,
                             textAlign: TextAlign.center,
                             style: TextStyle(
                                 fontWeight: FontWeight.bold, fontSize: 14)),
@@ -45,7 +45,7 @@ class ParticipationRoute extends StatelessWidget {
                               mainAxisAlignment: MainAxisAlignment.center,
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                Text(groups[i].value.name,
+                                Text(groups![i].value.name,
                                     maxLines: groups[i].value.leader.isNotEmpty
                                         ? 1
                                         : 2,
@@ -66,9 +66,9 @@ class ParticipationRoute extends StatelessWidget {
                           MyTableCell.content(
                               child: _getCellWidget(
                                   provider,
-                                  events[eventIndex].value,
+                                  events![eventIndex].value,
                                   events[eventIndex].key,
-                                  groups[groupIndex].key),
+                                  groups![groupIndex].key),
                               cellDimensions: cellDimensions),
                       legendCell:
                           MyTableCell.legend(cellDimensions: cellDimensions),
@@ -85,7 +85,7 @@ class ParticipationRoute extends StatelessWidget {
   Widget _getCellWidget(
       ParticipationProvider provider, Event event, int eventId, int groupId) {
     final groupStatus = (event.groups ?? {})[groupId];
-    Color color;
+    Color color = Colors.white;
     if (groupStatus == null) {
       color = Colors.white;
     } else {
@@ -94,10 +94,10 @@ class ParticipationRoute extends StatelessWidget {
           color = Colors.green;
           break;
         case GroupStatus.STATUS_CANNOT_PARTICIPATE:
-          color = Colors.red[400];
+          color = Colors.red[400]!;
           break;
         case GroupStatus.STATUS_APPOINTED:
-          color = Colors.blue[300];
+          color = Colors.blue[300]!;
           break;
       }
     }

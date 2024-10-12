@@ -7,7 +7,11 @@ class ParticipationTable {
   List<MapEntry<int, Event>> get sortedEvents => events.entries.toList()
     ..sort((e1, e2) => e1.value.timestamp.compareTo(e2.value.timestamp));
 
-  ParticipationTable({this.title, this.timestamp, this.isActive, this.events});
+  ParticipationTable(
+      {required this.title,
+      required this.timestamp,
+      required this.isActive,
+      required this.events});
 
   factory ParticipationTable.fromMap(Map map) {
     final title = map['title'];
@@ -51,15 +55,18 @@ class Event {
   final bool isActive;
   final Map<int, GroupStatus> groups;
 
-  Event({this.title, this.timestamp, this.isActive, this.groups});
+  Event(
+      {required this.title,
+      required this.timestamp,
+      required this.isActive,
+      required this.groups});
 
   factory Event.fromMap(Map map) {
     final title = map['title'];
     final timestamp = map['timestamp'];
     final isActive = map['isActive'] ?? true;
-    Map<int, GroupStatus> groups;
+    Map<int, GroupStatus> groups = {};
     if (map['groups'] is List) {
-      groups = {};
       for (int i = 0; i < map['groups'].length; i++) {
         if (map['groups'][i] != null) {
           groups[i] = GroupStatus.fromMap(map['groups'][i]);
@@ -67,7 +74,7 @@ class Event {
       }
     }
     if (map['groups'] is Map) {
-      groups = (map['groups'] as Map)?.map((key, value) =>
+      groups = (map['groups'] as Map).map((key, value) =>
           MapEntry(int.parse(key.toString()), GroupStatus.fromMap(value)));
     }
     return Event(
@@ -87,7 +94,7 @@ class GroupStatus {
 
   final int status;
 
-  GroupStatus({this.status});
+  GroupStatus({required this.status});
 
   GroupStatus.fromMap(Map map) : status = map['status'];
 

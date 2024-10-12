@@ -6,27 +6,27 @@ import 'package:music_groups/data/group.dart';
 import 'package:music_groups/data/participation_table.dart';
 
 class ParticipationProvider extends ChangeNotifier {
-  Map<int, Group> groups;
-  List<MapEntry<int, Group>> get sortedGroups {
+  Map<int, Group>? groups;
+  List<MapEntry<int, Group>>? get sortedGroups {
     if (groups == null) return null;
-    return groups.entries.toList()
+    return groups!.entries.toList()
       ..sort((g1, g2) => g1.value.name.compareTo(g2.value.name));
   }
 
-  ParticipationTable participationTable;
-  List<MapEntry<int, Event>> get sortedEvents {
+  ParticipationTable? participationTable;
+  List<MapEntry<int, Event>>? get sortedEvents {
     if (participationTable == null) return null;
-    return participationTable.sortedEvents;
+    return participationTable!.sortedEvents;
   }
 
-  int _tableId;
+  int? _tableId;
 
   bool _isGroupsLoaded = false;
   bool _isParticipationTableLoaded = false;
 
   bool get isDataLoaded => _isGroupsLoaded && _isParticipationTableLoaded;
 
-  StreamSubscription _dataStreamSubscription;
+  StreamSubscription? _dataStreamSubscription;
 
   ParticipationProvider() {
     _fetchGroups();
@@ -36,7 +36,7 @@ class ParticipationProvider extends ChangeNotifier {
   @override
   void dispose() {
     super.dispose();
-    _dataStreamSubscription.cancel();
+    _dataStreamSubscription?.cancel();
   }
 
   void toggleParticipation(int eventId, int groupId) async {
@@ -68,13 +68,13 @@ class ParticipationProvider extends ChangeNotifier {
     if (data is List) {
       for (int i = 0; i < data.length; i++) {
         if (data[i] != null) {
-          groups[i] = Group.fromMap(data[i]);
+          groups?[i] = Group.fromMap(data[i]);
         }
       }
     } else if (data is Map) {
       data.forEach((key, value) {
         final id = int.parse(key as String);
-        groups[id] = Group.fromMap(data[key]);
+        groups?[id] = Group.fromMap(data[key]);
       });
     }
     _isGroupsLoaded = true;
@@ -85,7 +85,7 @@ class ParticipationProvider extends ChangeNotifier {
     _dataStreamSubscription =
         database().ref('v2').onValue.listen((event) async {
       final data = (event.snapshot.val() as Map)['tables'];
-      Map map;
+      Map? map;
       if (data is List) {
         for (int i = 0; i < data.length; i++) {
           if (data[i] != null && data[i]['isActive']) {
