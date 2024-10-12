@@ -39,26 +39,37 @@ class ParticipationProvider extends ChangeNotifier {
     _dataStreamSubscription?.cancel();
   }
 
-  void toggleParticipation(int eventId, int groupId) async {
-    final dbRef = database()
+  DatabaseReference _getDbRefStatus(int eventId, int groupId) {
+    return database()
         .ref('v2/tables/$_tableId/events/$eventId/groups/$groupId/status');
-    int status = (await dbRef.once('value')).snapshot.val() ??
-        GroupStatus.STATUS_CANNOT_PARTICIPATE;
-    switch (status) {
-      case GroupStatus.STATUS_CANNOT_PARTICIPATE:
-        status = GroupStatus.STATUS_CAN_PARTICIPATE;
-        break;
+  }
+
+  void toggleParticipation(int eventId, int groupId) async {
+    switch (await getStatus(eventId, groupId)) {
       case GroupStatus.STATUS_CAN_PARTICIPATE:
-        status = GroupStatus.STATUS_CANNOT_PARTICIPATE;
+        removeParticipation(eventId, groupId);
+        break;
+      case GroupStatus.STATUS_CANNOT_PARTICIPATE:
+        setStatus(eventId, groupId, GroupStatus.STATUS_CAN_PARTICIPATE);
+        break;
+      case null:
+        setStatus(eventId, groupId, GroupStatus.STATUS_CAN_PARTICIPATE);
         break;
     }
-    await dbRef.set(status);
   }
 
   void removeParticipation(int eventId, int groupId) {
-    final dbRef = database()
-        .ref('v2/tables/$_tableId/events/$eventId/groups/$groupId/status');
-    dbRef.remove();
+    _getDbRefStatus(eventId, groupId).remove();
+  }
+
+  Future<int?> getStatus(int eventId, int groupId) async {
+    return (await _getDbRefStatus(eventId, groupId).once('value'))
+        .snapshot
+        .val();
+  }
+
+  void setStatus(int eventId, int groupId, int status) {
+    _getDbRefStatus(eventId, groupId).set(status);
   }
 
   void _fetchGroups() async {

@@ -103,7 +103,8 @@ class ParticipationRoute extends StatelessWidget {
     }
     return GestureDetector(
       onTap: () => provider.toggleParticipation(eventId, groupId),
-      onLongPress: () => provider.removeParticipation(eventId, groupId),
+      onLongPress: () => provider.setStatus(
+          eventId, groupId, GroupStatus.STATUS_CANNOT_PARTICIPATE),
       child: Container(
           width: double.infinity, height: double.infinity, color: color),
     );
