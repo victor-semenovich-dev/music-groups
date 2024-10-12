@@ -1,5 +1,18 @@
 {
   "projects": {
     "default": "music-groups-9b0cb"
-  }
+  },
+  "targets": {
+    "music-groups-9b0cb": {
+      "hosting": {
+        "dev": [
+          "music-groups-9b0cb"
+        ],
+        "prod": [
+          "music-groups-geth"
+        ]
+      }
+    }
+  },
+  "etags": {}
 }

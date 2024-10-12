@@ -1,1 +1,22 @@
-{"hosting":{"site":"music-groups-geth","public":"build/web","ignore":["firebase.json","**/.*","**/node_modules/**"]},"flutter":{"platforms":{"android":{"default":{"projectId":"music-groups-9b0cb","appId":"1:159157977140:android:e623b20938964ec4ef4a61","fileOutput":"android/app/google-services.json"}},"dart":{"lib/firebase_options.dart":{"projectId":"music-groups-9b0cb","configurations":{"android":"1:159157977140:android:e623b20938964ec4ef4a61","web":"1:159157977140:web:fb2f463810ec120eef4a61"}}}}}}
+{
+  "hosting": [
+    {
+      "target": "dev",
+      "public": "./build/web",
+      "ignore": [
+        "firebase.json",
+        "**/.*",
+        "**/node_modules/**"
+      ]
+    },
+    {
+      "target": "prod",
+      "public": "./build/web",
+      "ignore": [
+        "firebase.json",
+        "**/.*",
+        "**/node_modules/**"
+      ]
+    }
+  ]
+}
