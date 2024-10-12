@@ -6,6 +6,7 @@ class MusicGroupsApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'Участие музыкальных групп',
+      theme: ThemeData(useMaterial3: false),
       home: ParticipationRoute(),
     );
   }
