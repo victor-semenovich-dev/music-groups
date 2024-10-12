@@ -1,0 +1,98 @@
+{
+  "project_info": {
+    "project_number": "159157977140",
+    "firebase_url": "https://music-groups-9b0cb.firebaseio.com",
+    "project_id": "music-groups-9b0cb",
+    "storage_bucket": "music-groups-9b0cb.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:159157977140:android:b98563950762d446ef4a61",
+        "android_client_info": {
+          "package_name": "by.geth.groups.admin"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "159157977140-j7bt4bjm49hes5ghr1rnaldm4udtcd7a.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCBZKG6vERrsv8fjP6cERf1_tdQ5Xx36ig"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "159157977140-j7bt4bjm49hes5ghr1rnaldm4udtcd7a.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:159157977140:android:e623b20938964ec4ef4a61",
+        "android_client_info": {
+          "package_name": "by.geth.musicGroups"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "159157977140-j7bt4bjm49hes5ghr1rnaldm4udtcd7a.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCBZKG6vERrsv8fjP6cERf1_tdQ5Xx36ig"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "159157977140-j7bt4bjm49hes5ghr1rnaldm4udtcd7a.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:159157977140:android:d6c50d6d66198119ef4a61",
+        "android_client_info": {
+          "package_name": "by.geth.music_groups"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "159157977140-j7bt4bjm49hes5ghr1rnaldm4udtcd7a.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCBZKG6vERrsv8fjP6cERf1_tdQ5Xx36ig"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "159157977140-j7bt4bjm49hes5ghr1rnaldm4udtcd7a.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

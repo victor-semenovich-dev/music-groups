@@ -1,3 +1,4 @@
+import 'package:auto_size_text/auto_size_text.dart';
 import 'package:flutter/material.dart';
 import 'package:music_groups/data/participation_table.dart';
 import 'package:music_groups/provider/participation.dart';
@@ -11,7 +12,7 @@ class ParticipationRoute extends StatelessWidget {
   Widget build(BuildContext context) {
     const CellDimensions cellDimensions = CellDimensions.fixed(
       contentCellWidth: 100.0,
-      contentCellHeight: 55.0,
+      contentCellHeight: 65.0,
       stickyLegendWidth: 150.0,
       stickyLegendHeight: 55.0,
     );
@@ -55,10 +56,13 @@ class ParticipationRoute extends StatelessWidget {
                                         fontWeight: FontWeight.bold,
                                         fontSize: 14)),
                                 if (groups[i].value.leader.isNotEmpty)
-                                  Text('(${groups[i].value.leader})',
-                                      maxLines: 1,
-                                      overflow: TextOverflow.ellipsis,
-                                      style: TextStyle(fontSize: 12))
+                                  AutoSizeText(
+                                    '(${groups[i].value.leader})',
+                                    maxLines: 1,
+                                    overflow: TextOverflow.ellipsis,
+                                    minFontSize: 10,
+                                    maxFontSize: 12,
+                                  )
                               ],
                             ),
                           ),
@@ -95,9 +99,9 @@ class ParticipationRoute extends StatelessWidget {
     );
   }
 
-  Widget _getCellWidget(
-      ParticipationProvider provider, Event event, int eventId, int groupId) {
-    final groupStatus = (event.groups ?? {})[groupId];
+  Widget _getCellWidget(ParticipationProvider provider, TableEvent event,
+      int eventId, int groupId) {
+    final groupStatus = (event.groups)[groupId];
     Color color = Colors.white;
     if (groupStatus == null) {
       color = Colors.white;

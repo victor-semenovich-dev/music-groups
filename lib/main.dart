@@ -1,17 +1,9 @@
-import 'package:firebase/firebase.dart' as firebase;
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:music_groups/ui/app.dart';
 
-void main() {
-  if (firebase.apps.isEmpty) {
-    firebase.initializeApp(
-        apiKey: "AIzaSyAYF_m4iFeSLK1OQbC-hSeo253CKzu-Otc",
-        authDomain: "music-groups-9b0cb.firebaseapp.com",
-        databaseURL: "https://music-groups-9b0cb.firebaseio.com",
-        projectId: "music-groups-9b0cb",
-        storageBucket: "music-groups-9b0cb.appspot.com",
-        messagingSenderId: "159157977140",
-        appId: "1:159157977140:web:fb2f463810ec120eef4a61");
-  }
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await Firebase.initializeApp();
   runApp(MusicGroupsApp());
 }

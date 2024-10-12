@@ -1,6 +1,6 @@
 import 'dart:async';
 
-import 'package:firebase/firebase.dart';
+import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
 import 'package:music_groups/data/group.dart';
 import 'package:music_groups/data/participation_table.dart';
@@ -14,7 +14,7 @@ class ParticipationProvider extends ChangeNotifier {
   }
 
   ParticipationTable? participationTable;
-  List<MapEntry<int, Event>>? get sortedEvents {
+  List<MapEntry<int, TableEvent>>? get sortedEvents {
     if (participationTable == null) return null;
     return participationTable!.sortedEvents;
   }
@@ -40,7 +40,7 @@ class ParticipationProvider extends ChangeNotifier {
   }
 
   DatabaseReference _getDbRefStatus(int eventId, int groupId) {
-    return database()
+    return FirebaseDatabase.instance
         .ref('v2/tables/$_tableId/events/$eventId/groups/$groupId/status');
   }
 
@@ -63,9 +63,12 @@ class ParticipationProvider extends ChangeNotifier {
   }
 
   Future<int?> getStatus(int eventId, int groupId) async {
-    return (await _getDbRefStatus(eventId, groupId).once('value'))
-        .snapshot
-        .val();
+    final ref = _getDbRefStatus(eventId, groupId);
+    final status = (await ref.get()).value;
+    if (status is int) {
+      return status;
+    }
+    return null;
   }
 
   void setStatus(int eventId, int groupId, int status) {
@@ -73,8 +76,8 @@ class ParticipationProvider extends ChangeNotifier {
   }
 
   void _fetchGroups() async {
-    final event = await database().ref('v2/groups').once('value');
-    final data = event.snapshot.val();
+    final event = await FirebaseDatabase.instance.ref('v2/groups').get();
+    final data = event.value;
     groups = {};
     if (data is List) {
       for (int i = 0; i < data.length; i++) {
@@ -93,31 +96,39 @@ class ParticipationProvider extends ChangeNotifier {
   }
 
   void _listenParticipationTable() async {
-    _dataStreamSubscription =
-        database().ref('v2').onValue.listen((event) async {
-      final data = (event.snapshot.val() as Map)['tables'];
-      Map? map;
-      if (data is List) {
-        for (int i = 0; i < data.length; i++) {
-          if (data[i] != null && data[i]['isActive']) {
-            _tableId = i;
-            map = data[i];
-            break;
-          }
-        }
-      } else if (data is Map) {
-        for (MapEntry entry in data.entries) {
-          if (entry.value['isActive']) {
-            _tableId = int.parse(entry.key as String);
-            map = entry.value;
-          }
+    final event = await FirebaseDatabase.instance.ref('v2/tables').get();
+    final data = event.value;
+    Map? map;
+    if (data is List) {
+      for (int i = 0; i < data.length; i++) {
+        if (data[i] != null && data[i]['isActive']) {
+          _tableId = i;
+          map = data[i];
+          break;
         }
       }
-      if (_tableId != null && map != null) {
-        participationTable = ParticipationTable.fromMap(map);
+    } else if (data is Map) {
+      for (MapEntry entry in data.entries) {
+        if (entry.value['isActive']) {
+          _tableId = int.parse(entry.key as String);
+          map = entry.value;
+        }
       }
-      _isParticipationTableLoaded = true;
-      notifyListeners();
-    });
+    }
+    if (_tableId != null && map != null) {
+      participationTable = ParticipationTable.fromMap(map);
+      _dataStreamSubscription = FirebaseDatabase.instance
+          .ref('v2/tables/$_tableId')
+          .onValue
+          .listen((event) {
+        final value = event.snapshot.value;
+        if (value is Map) {
+          participationTable = ParticipationTable.fromMap(value);
+          notifyListeners();
+        }
+      });
+    }
+    _isParticipationTableLoaded = true;
+    notifyListeners();
   }
 }

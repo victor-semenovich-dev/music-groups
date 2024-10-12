@@ -2,9 +2,9 @@ class ParticipationTable {
   final String title;
   final int timestamp;
   final bool isActive;
-  final Map<int, Event> events;
+  final Map<int, TableEvent> events;
 
-  List<MapEntry<int, Event>> get sortedEvents => events.entries.toList()
+  List<MapEntry<int, TableEvent>> get sortedEvents => events.entries.toList()
     ..sort((e1, e2) => e1.value.timestamp.compareTo(e2.value.timestamp));
 
   ParticipationTable(
@@ -17,13 +17,13 @@ class ParticipationTable {
     final title = map['title'];
     final timestamp = map['timestamp'];
     final isActive = map['isActive'];
-    final Map<int, Event> events = {};
+    final Map<int, TableEvent> events = {};
 
     final eventsData = map['events'];
     if (eventsData is List) {
       for (int i = 0; i < eventsData.length; i++) {
         if (eventsData[i] != null) {
-          final event = Event.fromMap(eventsData[i]);
+          final event = TableEvent.fromMap(eventsData[i]);
           if (event.isActive) {
             events[i] = event;
           }
@@ -32,7 +32,7 @@ class ParticipationTable {
     } else if (eventsData is Map) {
       eventsData.forEach((key, value) {
         final id = int.parse(key as String);
-        final event = Event.fromMap(eventsData[id]);
+        final event = TableEvent.fromMap(eventsData[id]);
         if (event.isActive) {
           events[id] = event;
         }
@@ -49,19 +49,19 @@ class ParticipationTable {
   }
 }
 
-class Event {
+class TableEvent {
   final String title;
   final int timestamp;
   final bool isActive;
   final Map<int, GroupStatus> groups;
 
-  Event(
+  TableEvent(
       {required this.title,
       required this.timestamp,
       required this.isActive,
       required this.groups});
 
-  factory Event.fromMap(Map map) {
+  factory TableEvent.fromMap(Map map) {
     final title = map['title'];
     final timestamp = map['timestamp'];
     final isActive = map['isActive'] ?? true;
@@ -77,7 +77,7 @@ class Event {
       groups = (map['groups'] as Map).map((key, value) =>
           MapEntry(int.parse(key.toString()), GroupStatus.fromMap(value)));
     }
-    return Event(
+    return TableEvent(
         title: title, timestamp: timestamp, isActive: isActive, groups: groups);
   }
 
