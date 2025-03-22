@@ -8,6 +8,10 @@ import 'package:provider/provider.dart';
 import 'package:table_sticky_headers/table_sticky_headers.dart';
 
 class ParticipationRoute extends StatelessWidget {
+  final int groupId;
+
+  const ParticipationRoute({Key? key, required this.groupId}) : super(key: key);
+
   @override
   Widget build(BuildContext context) {
     const CellDimensions cellDimensions = CellDimensions.fixed(
@@ -70,6 +74,7 @@ class ParticipationRoute extends StatelessWidget {
                       contentCellBuilder: (eventIndex, groupIndex) =>
                           MyTableCell.content(
                               child: _getCellWidget(
+                                  context,
                                   provider,
                                   events![eventIndex].value,
                                   events[eventIndex].key,
@@ -99,8 +104,13 @@ class ParticipationRoute extends StatelessWidget {
     );
   }
 
-  Widget _getCellWidget(ParticipationProvider provider, TableEvent event,
-      int eventId, int groupId) {
+  Widget _getCellWidget(
+    BuildContext context,
+    ParticipationProvider provider,
+    TableEvent event,
+    int eventId,
+    int groupId,
+  ) {
     final groupStatus = (event.groups)[groupId];
     Color color = Colors.white;
     if (groupStatus == null) {
@@ -119,7 +129,17 @@ class ParticipationRoute extends StatelessWidget {
       }
     }
     return GestureDetector(
-      onTap: () => provider.toggleParticipation(eventId, groupId),
+      onTap: () {
+        if (groupId == this.groupId) {
+          provider.toggleParticipation(eventId, groupId);
+        } else {
+          ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+            content: Text(
+              'Можно отмечаться только в своих ячейках',
+            ),
+          ));
+        }
+      },
       onLongPress: () => provider.setStatus(
           eventId, groupId, GroupStatus.STATUS_CANNOT_PARTICIPATE),
       child: Container(
