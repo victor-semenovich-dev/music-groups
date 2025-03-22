@@ -26,10 +26,15 @@ class ParticipationRoute extends StatelessWidget {
         builder: (context, provider, child) {
           final groups = provider.sortedGroups;
           final events = provider.sortedEvents;
+
+          final groupTitle = provider.groups?[this.groupId]?.name;
+          final tableTitle = provider.participationTable?.title;
+          final title =
+              [groupTitle, tableTitle].where((part) => part != null).join(", ");
+
           return Scaffold(
             appBar: AppBar(
-              title:
-                  Text(provider.participationTable?.title ?? 'Участие групп'),
+              title: Text(title),
             ),
             body: SafeArea(
               child: provider.isDataLoaded
