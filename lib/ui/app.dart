@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:music_groups/ui/route/participation.dart';
+import 'package:music_groups/ui/route/groups.dart';
 
 class MusicGroupsApp extends StatelessWidget {
   @override
@@ -7,7 +7,7 @@ class MusicGroupsApp extends StatelessWidget {
     return MaterialApp(
       title: 'Участие музыкальных групп',
       theme: ThemeData(useMaterial3: false),
-      home: ParticipationRoute(),
+      home: GroupsRoute(),
     );
   }
 }
