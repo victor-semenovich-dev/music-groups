@@ -3,7 +3,6 @@ import 'package:flutter/material.dart';
 import 'package:music_groups/data/participation_table.dart';
 import 'package:music_groups/provider/participation.dart';
 import 'package:music_groups/ui/widget/table_cell.dart';
-import 'package:package_info_plus/package_info_plus.dart';
 import 'package:provider/provider.dart';
 import 'package:table_sticky_headers/table_sticky_headers.dart';
 
@@ -87,17 +86,7 @@ class ParticipationRoute extends StatelessWidget {
                               cellDimensions: cellDimensions),
                       legendCell: MyTableCell.legend(
                         cellDimensions: cellDimensions,
-                        child: FutureBuilder<PackageInfo>(
-                            future: PackageInfo.fromPlatform(),
-                            builder: (context, info) {
-                              final data = info.data;
-                              if (data != null) {
-                                return Text(
-                                    "v${data.version} (${data.buildNumber})");
-                              } else {
-                                return Container();
-                              }
-                            }),
+                        child: Container(),
                       ),
                       cellDimensions: cellDimensions,
                     )
