@@ -1,6 +1,9 @@
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
 import 'package:music_groups/data/group.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+
+import '../ui/route/participation.dart';
 
 class GroupsProvider extends ChangeNotifier {
   Map<int, Group>? groups;
@@ -14,8 +17,33 @@ class GroupsProvider extends ChangeNotifier {
 
   bool get isDataLoaded => _isGroupsLoaded;
 
-  GroupsProvider() {
+  BuildContext context;
+  SharedPreferences? prefs;
+
+  GroupsProvider({required this.context}) {
+    _initPrefs();
     _fetchGroups();
+  }
+
+  void _initPrefs() async {
+    prefs = await SharedPreferences.getInstance();
+    final savedGroupId = prefs?.getInt("groupId");
+    if (savedGroupId != null) {
+      Navigator.of(context).push(
+        MaterialPageRoute(
+          builder: (context) => ParticipationRoute(groupId: savedGroupId),
+        ),
+      );
+    }
+  }
+
+  void selectGroup(int id) async {
+    await prefs?.setInt("groupId", id);
+    Navigator.of(context).push(
+      MaterialPageRoute(
+        builder: (context) => ParticipationRoute(groupId: id),
+      ),
+    );
   }
 
   void _fetchGroups() async {
